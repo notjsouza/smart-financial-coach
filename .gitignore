@@ -8,6 +8,10 @@
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
+
+# amplify
+amplify_outputs.json
+.amplify/
 !.yarn/versions
 
 # testing

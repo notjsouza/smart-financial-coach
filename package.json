@@ -6,10 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "amplify:dev": "npx ampx sandbox --profile default",
+    "amplify:deploy": "npx ampx pipeline-deploy --branch main --profile default"
   },
   "dependencies": {
-    "@aws-amplify/backend": "^1.16.1",
     "@aws-amplify/ui-react": "^6.12.0",
     "aws-amplify": "^6.15.5",
     "next": "15.5.2",
@@ -17,14 +18,21 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@aws-amplify/backend": "^1.16.1",
+    "@aws-amplify/backend-cli": "^1.8.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^20",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
+    "aws-cdk-lib": "^2.204.0",
+    "constructs": "^10.0.0",
+    "esbuild": "^0.25.9",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }
