@@ -1,4 +1,11 @@
+import { Metadata } from 'next';
+import AmplifyProvider from '../components/AmplifyProvider';
 import Navbar from "../components/Navbar";
+
+export const metadata: Metadata = {
+  title: 'Smart Financial Coach',
+  description: 'Your personal financial coaching app',
+};
 
 export default function RootLayout({
   children,
@@ -8,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <div className="App">{children}</div>
+        <AmplifyProvider>
+          <Navbar />
+          <div className="App">{children}</div>
+        </AmplifyProvider>
       </body>
     </html>
   );
