@@ -13,6 +13,9 @@ export const backend = defineBackend({
   plaidHandler,
 });
 
+backend.oauthHandler.addEnvironment('USER_POOL_ID', backend.auth.resources.userPool.userPoolId);
+backend.oauthHandler.addEnvironment('USER_POOL_CLIENT_ID', backend.auth.resources.userPoolClient.userPoolClientId);
+
 const oauthFunction = backend.oauthHandler.resources.lambda;
 const plaidFunction = backend.plaidHandler.resources.lambda;
 
