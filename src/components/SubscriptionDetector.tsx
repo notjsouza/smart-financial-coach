@@ -22,6 +22,7 @@ interface DetectedSubscription {
 
 interface SubscriptionDetectorProps {
   transactions: PlaidTransaction[];
+  onSubscriptionsDetected?: (subscriptions: DetectedSubscription[]) => void;
 }
 
 const normalizeMerchant = (name: string): string => {
@@ -121,7 +122,7 @@ const categorizeSubscription = (merchantName: string): string => {
   return 'Other';
 };
 
-export default function HybridSubscriptionDetector({ transactions }: SubscriptionDetectorProps) {
+export default function HybridSubscriptionDetector({ transactions, onSubscriptionsDetected }: SubscriptionDetectorProps) {
   const [detectedSubscriptions, setDetectedSubscriptions] = useState<DetectedSubscription[]>([]);
   const [totalMonthlyCost, setTotalMonthlyCost] = useState(0);
 
@@ -347,10 +348,15 @@ export default function HybridSubscriptionDetector({ transactions }: Subscriptio
 
       setDetectedSubscriptions(uniqueSubscriptions);
       setTotalMonthlyCost(uniqueSubscriptions.reduce((sum, sub) => sum + sub.monthlyEquivalent, 0));
+      
+      // Callback to parent component with detected subscriptions
+      if (onSubscriptionsDetected) {
+        onSubscriptionsDetected(uniqueSubscriptions);
+      }
     };
 
     detectSubscriptions();
-  }, [transactions]);
+  }, [transactions, onSubscriptionsDetected]);
 
   if (detectedSubscriptions.length === 0) {
     return (

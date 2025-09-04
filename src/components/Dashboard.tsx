@@ -4,11 +4,31 @@ import { useState, useEffect } from 'react';
 import { formatCurrency } from '../lib/utils';
 import PlaidLink from './PlaidLink';
 import SubscriptionDetector from './SubscriptionDetector';
+import AIFinancialCoach from './AIFinancialCoach';
 import { PlaidService, PlaidAccount, PlaidTransaction } from '../lib/plaid';
+import { Transaction } from '../types/financial';
+
+// DetectedSubscription interface from SubscriptionDetector
+interface DetectedSubscription {
+  id: string;
+  name: string;
+  amount: number;
+  frequency: 'monthly' | 'yearly' | 'weekly' | 'biweekly';
+  lastCharge: string;
+  nextEstimatedCharge: string;
+  merchantName: string;
+  category: string;
+  monthlyEquivalent: number;
+  confidence: 'high' | 'medium' | 'low';
+  transactions: PlaidTransaction[];
+  detectionMethod: string;
+  averageInterval?: number;
+}
 
 function Dashboard() {
   const [plaidAccounts, setPlaidAccounts] = useState<PlaidAccount[]>([]);
   const [plaidTransactions, setPlaidTransactions] = useState<PlaidTransaction[]>([]);
+  const [detectedSubscriptions, setDetectedSubscriptions] = useState<DetectedSubscription[]>([]);
   const [isLoadingPlaidData, setIsLoadingPlaidData] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -316,8 +336,23 @@ function Dashboard() {
               return null;
             })()}
             {plaidTransactions.length > 0 ? (
-              <div className="mb-8">
-                <SubscriptionDetector transactions={plaidTransactions} />
+              <div className="space-y-8">
+                {/* Subscription Detection */}
+                <div>
+                  <SubscriptionDetector 
+                    transactions={plaidTransactions} 
+                    onSubscriptionsDetected={setDetectedSubscriptions}
+                  />
+                </div>
+                
+                {/* AI Financial Coach */}
+                <div>
+                  <AIFinancialCoach
+                    transactions={convertPlaidToTransaction(plaidTransactions)}
+                    subscriptions={convertDetectedSubscriptions(detectedSubscriptions)}
+                    totalMonthlySpending={calculateTotalMonthlySpending(plaidTransactions)}
+                  />
+                </div>
               </div>
             ) : (
               <div className="mb-8 bg-white rounded-lg shadow-md p-6">
@@ -335,6 +370,35 @@ function Dashboard() {
       </div>
     </div>
   );
+
+  function convertPlaidToTransaction(plaidTransactions: PlaidTransaction[]): Transaction[] {
+    return plaidTransactions.map((pt, index) => ({
+      id: index + 1,
+      description: pt.name,
+      amount: Math.abs(pt.amount),
+      date: pt.date,
+      category: pt.category?.[0] || 'Other'
+    }));
+  }
+
+  function calculateTotalMonthlySpending(plaidTransactions: PlaidTransaction[]): number {
+    return plaidTransactions
+      .filter(t => t.amount < 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  }
+
+  function convertDetectedSubscriptions(subscriptions: DetectedSubscription[]) {
+    return subscriptions.map(sub => ({
+      ...sub,
+      transactions: sub.transactions.map((t, index) => ({
+        id: index + 1,
+        description: t.name,
+        amount: Math.abs(t.amount),
+        date: t.date,
+        category: t.category?.[0] || 'Other'
+      }))
+    }));
+  }
 }
 
 export default Dashboard;

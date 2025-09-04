@@ -67,9 +67,39 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
   }
 
   try {
+    if (path === '/debug') {
+      return {
+        statusCode: 200,
+        headers: getCorsHeaders(),
+        body: JSON.stringify({
+          message: 'Debug endpoint working',
+          environment: {
+            hasGoogleClientId: !!process.env.GOOGLE_CLIENT_ID,
+            hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+            hasFrontendUrl: !!process.env.FRONTEND_URL,
+            frontendUrl: process.env.FRONTEND_URL,
+            allEnvKeys: Object.keys(process.env).filter(key => 
+              key.includes('GOOGLE') || 
+              key.includes('FRONTEND') || 
+              key.includes('PLAID')
+            )
+          },
+          path: path,
+          method: event.requestContext.http.method
+        }),
+      };
+    }
+
     if (path === '/auth/google') {
       const googleClientId = process.env.GOOGLE_CLIENT_ID;
       const frontendUrl = process.env.FRONTEND_URL;
+      
+      console.log('Debug - Environment variables check:', {
+        hasGoogleClientId: !!googleClientId,
+        googleClientIdLength: googleClientId?.length || 0,
+        frontendUrl: frontendUrl,
+        allEnvKeys: Object.keys(process.env).filter(key => key.includes('GOOGLE') || key.includes('FRONTEND'))
+      });
       
       if (!googleClientId || googleClientId === 'placeholder-client-id') {
         return {
@@ -77,7 +107,12 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
           headers: getCorsHeaders(),
           body: JSON.stringify({ 
             error: 'Google OAuth not configured', 
-            message: 'Please set GOOGLE_CLIENT_ID environment variable' 
+            message: 'Please set GOOGLE_CLIENT_ID environment variable',
+            debug: {
+              hasGoogleClientId: !!googleClientId,
+              googleClientIdValue: googleClientId,
+              allEnvKeys: Object.keys(process.env).filter(key => key.includes('GOOGLE') || key.includes('FRONTEND'))
+            }
           }),
         };
       }
