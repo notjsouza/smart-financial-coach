@@ -1,5 +1,5 @@
 export const CONFIG = {
-  OAUTH_HANDLER_URL: process.env.NEXT_PUBLIC_OAUTH_HANDLER_URL || 'https://wkhxqpckkkyajf3arhaqosfybq0ublyl.lambda-url.us-west-1.on.aws',
+  OAUTH_HANDLER_URL: process.env.NEXT_PUBLIC_OAUTH_HANDLER_URL || 'https://ytzpw6srolqwuiwvjyszzhkbyu0njapp.lambda-url.us-west-1.on.aws',
   PLAID_HANDLER_URL: process.env.NEXT_PUBLIC_PLAID_HANDLER_URL || 'https://ccqi52efoid2eks5klxua4rztq0bnzih.lambda-url.us-west-1.on.aws',
   API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
   FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'),
