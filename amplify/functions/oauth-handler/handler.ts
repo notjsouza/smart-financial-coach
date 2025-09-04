@@ -43,14 +43,14 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
 
   const getCorsHeaders = () => {
     const allowedOrigins = [
-      'http://localhost:3000', 
-      'https://master.de1wgui96xpih.amplifyapp.com/'
+      'https://master.de1wgui96xpih.amplifyapp.com',
+      'http://localhost:3000'
     ];
     const isAllowedOrigin = origin && allowedOrigins.includes(origin);
     
     return {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'http://localhost:3000',
+      'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://master.de1wgui96xpih.amplifyapp.com',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
       'Access-Control-Allow-Credentials': 'false',
@@ -58,7 +58,6 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
     };
   };
 
-  // Handle preflight OPTIONS requests
   if (event.requestContext.http.method === 'OPTIONS') {
     return {
       statusCode: 200,

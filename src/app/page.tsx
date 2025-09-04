@@ -17,29 +17,23 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
   
-  // Check if user came back from successful OAuth
   useEffect(() => {
     const oauthSuccess = searchParams.get('oauth_success');
     if (oauthSuccess === 'true') {
-      // Store a flag to show dashboard even without Amplify user
       localStorage.setItem('oauth_authenticated', 'true');
-      // Try to get user info from localStorage if stored by callback
       const storedUser = localStorage.getItem('google_user');
       if (storedUser) {
         setGoogleUser(JSON.parse(storedUser));
       }
       
-      // Dispatch event to notify navbar and other components
       window.dispatchEvent(new Event('auth-change'));
       
-      // Clean up URL by removing the oauth_success parameter
       const url = new URL(window.location.href);
       url.searchParams.delete('oauth_success');
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);
 
-  // Check localStorage on mount and listen for changes
   useEffect(() => {
     const checkAuthState = () => {
       const isOAuthAuthenticated = localStorage.getItem('oauth_authenticated') === 'true';
@@ -51,10 +45,8 @@ function HomeContent() {
       }
     };
 
-    // Check initial state
     checkAuthState();
 
-    // Listen for storage changes (when sign out happens)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'oauth_authenticated' || e.key === 'google_user') {
         checkAuthState();
@@ -63,7 +55,6 @@ function HomeContent() {
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Also listen for custom events (for same-tab changes)
     const handleAuthChange = () => checkAuthState();
     window.addEventListener('auth-change', handleAuthChange);
 
@@ -77,14 +68,12 @@ function HomeContent() {
     window.location.href = `${CONFIG.OAUTH_HANDLER_URL}/auth/google`;
   };
 
-  // If user is authenticated via Amplify OR Google OAuth, show dashboard
   const isAuthenticated = user || googleUser;
 
   if (isAuthenticated) {
     return <Dashboard />;
   }
 
-  // Show login screen
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8">

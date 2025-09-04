@@ -1,6 +1,7 @@
 import { defineFunction } from '@aws-amplify/backend';
 
 export const oauthHandler = defineFunction({
+  name: 'oauth-handler',
   entry: './handler.ts',
   environment: {
 

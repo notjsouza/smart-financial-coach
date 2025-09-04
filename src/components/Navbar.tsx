@@ -13,7 +13,6 @@ function Navbar() {
   const router = useRouter();
   const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
 
-  // Check localStorage for Google OAuth user and listen for changes
   useEffect(() => {
     const checkAuthState = () => {
       const isOAuthAuthenticated = localStorage.getItem('oauth_authenticated') === 'true';
@@ -25,10 +24,8 @@ function Navbar() {
       }
     };
 
-    // Check initial state
     checkAuthState();
 
-    // Listen for storage changes and custom auth events
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'oauth_authenticated' || e.key === 'google_user') {
         checkAuthState();
@@ -36,7 +33,6 @@ function Navbar() {
     };
 
     const handleAuthChange = () => {
-      // Small delay to ensure localStorage is updated
       setTimeout(checkAuthState, 100);
     };
 
@@ -59,33 +55,26 @@ function Navbar() {
     };
   }, []);
 
-  // Check if user is authenticated (either Amplify or Google OAuth)
   const isAuthenticated = user || googleUser;
 
-  // If not authenticated, don't render the navbar
   if (!isAuthenticated) {
     return null;
   }
 
   const handleSignOut = () => {
-    // Handle Amplify sign out
     if (user) {
       signOut();
     }
     
-    // Handle Google OAuth sign out
     localStorage.removeItem('oauth_authenticated');
     localStorage.removeItem('google_user');
     setGoogleUser(null);
     
-    // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('auth-change'));
     
-    // Redirect to home
     router.push('/');
   };
 
-  // Get display name from either Amplify user or Google user
   const displayName = user?.signInDetails?.loginId || user?.username || googleUser?.name || 'User';
 
   return (
