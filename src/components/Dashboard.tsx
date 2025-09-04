@@ -1,7 +1,10 @@
 "use client";
 
+import { DashboardData } from '../types/financial';
+import { formatCurrency, getProgressPercentage } from '../lib/utils';
+
 // Mock data for demonstration
-const mockData = {
+const mockData: DashboardData = {
   account: {
     balance: 12847.50,
     monthlyIncome: 5200.00,
@@ -30,17 +33,6 @@ const mockData = {
 };
 
 function Dashboard() {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
-
-  const getProgressPercentage = (current: number, target: number) => {
-    return Math.min((current / target) * 100, 100);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">

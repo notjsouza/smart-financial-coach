@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import AmplifyProvider from '../components/AmplifyProvider';
 import Navbar from "../components/Navbar";
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Smart Financial Coach',
