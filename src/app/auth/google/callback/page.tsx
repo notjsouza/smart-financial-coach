@@ -34,7 +34,6 @@ function CallbackContent() {
       setStatus('loading');
       
       const requestUrl = `${CONFIG.OAUTH_HANDLER_URL}/auth/google/callback?code=${encodeURIComponent(code)}`;
-      console.log('Making request to:', requestUrl);
       
       const response = await fetch(requestUrl, {
         method: 'GET',
@@ -45,8 +44,6 @@ function CallbackContent() {
         mode: 'cors',
         credentials: 'omit',
       });
-
-      console.log('Response status:', response.status);
       
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -63,7 +60,6 @@ function CallbackContent() {
       }
 
       const data: AuthResponse = await response.json();
-      console.log('Response data:', data);
 
       if (!data.success) {
         setStatus('error');
@@ -74,11 +70,9 @@ function CallbackContent() {
       setUserInfo(data.user);
       setStatus('success');
       
-      // Store user info for the main app
       localStorage.setItem('oauth_authenticated', 'true');
       localStorage.setItem('google_user', JSON.stringify(data.user));
       
-      // Redirect to main app after successful sign-in
       setTimeout(() => {
         router.push('/?oauth_success=true');
       }, 2000);

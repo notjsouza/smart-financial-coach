@@ -141,13 +141,11 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Financial Dashboard</h1>
           <p className="text-gray-600">Welcome back! Here&apos;s your financial overview.</p>
         </div>
 
-        {/* Bank Connection Section */}
         <div className="mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
@@ -204,7 +202,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
@@ -246,9 +243,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Transactions */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
@@ -275,7 +270,6 @@ function Dashboard() {
                 ))}
               </div>
 
-              {/* Pagination Controls */}
               {plaidTransactions.length > transactionsPerPage && (
                 <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
                   <div className="flex items-center space-x-2">
@@ -326,39 +320,37 @@ function Dashboard() {
                 </div>
               )}
             </div>
+
+            {plaidTransactions.length > 0 && (
+              <div className="mt-8">
+                <AIFinancialCoach
+                  transactions={convertPlaidToTransaction(plaidTransactions)}
+                  subscriptions={convertDetectedSubscriptions(detectedSubscriptions)}
+                  totalMonthlySpending={calculateTotalMonthlySpending(plaidTransactions)}
+                />
+              </div>
+            )}
           </div>
 
-          {/* Subscription Detection Section */}
           <div>
             {(() => {
-              console.log('📊 Dashboard: plaidTransactions.length =', plaidTransactions.length);
-              console.log('📊 Sample transactions:', plaidTransactions.slice(0, 3));
+              if (plaidTransactions.length === 0) {
+                return <div className="text-gray-500">No transactions available for analysis.</div>;
+              }
               return null;
             })()}
             {plaidTransactions.length > 0 ? (
-              <div className="space-y-8">
-                {/* Subscription Detection */}
-                <div>
-                  <SubscriptionDetector 
-                    transactions={plaidTransactions} 
-                    onSubscriptionsDetected={setDetectedSubscriptions}
-                  />
-                </div>
-                
-                {/* AI Financial Coach */}
-                <div>
-                  <AIFinancialCoach
-                    transactions={convertPlaidToTransaction(plaidTransactions)}
-                    subscriptions={convertDetectedSubscriptions(detectedSubscriptions)}
-                    totalMonthlySpending={calculateTotalMonthlySpending(plaidTransactions)}
-                  />
-                </div>
+              <div>
+                <SubscriptionDetector 
+                  transactions={plaidTransactions} 
+                  onSubscriptionsDetected={setDetectedSubscriptions}
+                />
               </div>
             ) : (
               <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">🔍 Subscription Detection</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Subscription Detection</h2>
                 <div className="text-center py-8">
-                  <div className="text-gray-500 mb-2">⏳ Waiting for transaction data...</div>
+                  <div className="text-gray-500 mb-2">Waiting for transaction data...</div>
                   <p className="text-sm text-gray-400">
                     {isLoadingPlaidData ? 'Loading transactions...' : 'No transactions available'}
                   </p>
@@ -372,18 +364,26 @@ function Dashboard() {
   );
 
   function convertPlaidToTransaction(plaidTransactions: PlaidTransaction[]): Transaction[] {
-    return plaidTransactions.map((pt, index) => ({
-      id: index + 1,
-      description: pt.name,
-      amount: Math.abs(pt.amount),
-      date: pt.date,
-      category: pt.category?.[0] || 'Other'
-    }));
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return plaidTransactions
+      .filter(pt => new Date(pt.date) >= thirtyDaysAgo)
+      .map((pt, index) => ({
+        id: index + 1,
+        description: pt.name,
+        amount: Math.abs(pt.amount),
+        date: pt.date,
+        category: pt.category?.[0] || 'Other'
+      }));
   }
 
   function calculateTotalMonthlySpending(plaidTransactions: PlaidTransaction[]): number {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
     return plaidTransactions
-      .filter(t => t.amount < 0)
+      .filter(t => t.amount < 0 && new Date(t.date) >= thirtyDaysAgo)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   }
 

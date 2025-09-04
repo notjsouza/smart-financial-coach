@@ -92,15 +92,7 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
 
     if (path === '/auth/google') {
       const googleClientId = process.env.GOOGLE_CLIENT_ID;
-      const frontendUrl = process.env.FRONTEND_URL;
-      
-      console.log('Debug - Environment variables check:', {
-        hasGoogleClientId: !!googleClientId,
-        googleClientIdLength: googleClientId?.length || 0,
-        frontendUrl: frontendUrl,
-        allEnvKeys: Object.keys(process.env).filter(key => key.includes('GOOGLE') || key.includes('FRONTEND'))
-      });
-      
+
       if (!googleClientId || googleClientId === 'placeholder-client-id') {
         return {
           statusCode: 500,
@@ -123,7 +115,8 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
       if (referer && referer.includes('localhost')) {
         redirectUri = 'http://localhost:3000/auth/google/callback';
       } else {
-        redirectUri = `${frontendUrl}/auth/google/callback`;
+        const lambdaUrl = `https://${event.requestContext.domainName}`;
+        redirectUri = `${lambdaUrl}/auth/google/callback`;
       }
       
       const scope = 'openid email profile';
@@ -159,7 +152,6 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
 
       const googleClientId = process.env.GOOGLE_CLIENT_ID;
       const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-      const frontendUrl = process.env.FRONTEND_URL;
       
       if (!googleClientId || !googleClientSecret || 
           googleClientId === 'placeholder-client-id' || 
@@ -180,7 +172,8 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
       if (referer && referer.includes('localhost')) {
         redirectUri = 'http://localhost:3000/auth/google/callback';
       } else {
-        redirectUri = `${frontendUrl}/auth/google/callback`;
+        const lambdaUrl = `https://${event.requestContext.domainName}`;
+        redirectUri = `${lambdaUrl}/auth/google/callback`;
       }
 
       const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -286,7 +279,6 @@ async function createOrGetCognitoUser(userInfo: GoogleUserInfo) {
     });
 
     await cognitoClient.send(getUserCommand);
-    console.log('User already exists in Cognito');
     return { status: 'existing_user' };
 
   } catch (error: unknown) {
@@ -307,7 +299,6 @@ async function createOrGetCognitoUser(userInfo: GoogleUserInfo) {
         });
 
         await cognitoClient.send(createUserCommand);
-        console.log('Created new Cognito user');
 
         const setPasswordCommand = new AdminSetUserPasswordCommand({
           UserPoolId: userPoolId,
@@ -317,8 +308,6 @@ async function createOrGetCognitoUser(userInfo: GoogleUserInfo) {
         });
 
         await cognitoClient.send(setPasswordCommand);
-        console.log('Set permanent password for user');
-
         return { status: 'created_user' };
 
       } catch (createError) {

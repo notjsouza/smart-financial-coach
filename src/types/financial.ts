@@ -1,4 +1,3 @@
-// Types for the financial data
 export interface Account {
   balance: number;
   monthlyIncome: number;

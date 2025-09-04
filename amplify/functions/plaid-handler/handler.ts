@@ -58,12 +58,6 @@ const getPlaidClient = () => {
   const secret = process.env.PLAID_SECRET;
   const env = process.env.PLAID_ENV || 'sandbox';
   
-  console.log('Plaid configuration:', {
-    clientId: clientId ? `${clientId.substring(0, 8)}...` : 'undefined',
-    secret: secret ? `${secret.substring(0, 8)}...` : 'undefined',
-    env
-  });
-
   if (!clientId || !secret) {
     throw new Error('Plaid credentials not configured');
   }
@@ -97,15 +91,11 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
   try {
     const plaidClient = getPlaidClient();
 
-    console.log(`Plaid handler called: ${method} ${path}`);
 
     if (path === '/create-link-token' && method === 'POST') {
       try {
         const body = event.body ? JSON.parse(event.body) : {};
         const userId = body.userId || 'demo-user';
-
-        console.log('Creating link token for user:', userId);
-
         const linkTokenRequest: LinkTokenCreateRequest = {
           user: {
             client_user_id: userId,
@@ -116,12 +106,8 @@ export const handler: Handler<LambdaFunctionUrlEvent, LambdaFunctionUrlResponse>
           language: 'en',
         };
 
-        console.log('Link token request:', linkTokenRequest);
-
         const response = await plaidClient.linkTokenCreate(linkTokenRequest);
-
-        console.log('Link token created successfully');
-
+        
         return {
           statusCode: 200,
           headers: getCorsHeaders(origin),

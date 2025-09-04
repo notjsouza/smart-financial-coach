@@ -36,9 +36,7 @@ export class PlaidService {
       });
 
       const data = await response.json();
-      
-      console.log('Plaid createLinkToken response:', data);
-      
+            
       if (!data.success) {
         console.error('Plaid createLinkToken error:', data);
         throw new Error(data.error || 'Failed to create link token');
