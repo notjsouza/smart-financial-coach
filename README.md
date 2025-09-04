@@ -2,6 +2,10 @@ Youtube Demo
 
 [![Watch the video](img.youtube.com/vi/qrPbmtIxojU.png)]([https://youtu.be/qrPbmtIxojU])
 
+Design Doc
+
+https://docs.google.com/document/d/1SZ9OfAOPdfPn5ZNpXXrnDFjJshGJLZjI5E_UKbnZm-8/edit?usp=sharing
+
 
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
